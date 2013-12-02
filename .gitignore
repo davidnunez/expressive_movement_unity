@@ -42,4 +42,7 @@ Thumbs.db
 /*.sln
 /*.suo
 /*.user
+
+# Ignored Plugins
 Assets/plugins/IK
+Assets/plugins/iTween
