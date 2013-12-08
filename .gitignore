@@ -43,6 +43,9 @@ Thumbs.db
 /*.suo
 /*.user
 
+# Ignore binary
+/*.app
+
 # Ignored Plugins
 Assets/plugins/IK
 Assets/plugins/iTween
