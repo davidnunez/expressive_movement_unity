@@ -49,3 +49,13 @@ Thumbs.db
 # Ignored Plugins
 Assets/plugins/IK
 Assets/plugins/iTween
+
+/Assets/plugins/iTweenEditor/
+
+/Assets/Editor/iTweenEventDataEditor.cs
+/Assets/Editor/iTweenPathEditor.cs
+
+/Assets/plugins/IK Test/
+/Assets/plugins/radical
+
+/Assets/Gizmos/iTweenIcon.tif
