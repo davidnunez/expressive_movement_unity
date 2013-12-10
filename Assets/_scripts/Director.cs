@@ -43,14 +43,16 @@ public class Director : MonoBehaviour {
 	public GameObject w222;	
 	
 	public enum ConditionPath {fu,fn,fd,nu,nn,nd,bu,bn,bd};
-	public enum GUIState {intro, movie, studyIntro, runningTrial};
+	public enum GUIState {intro, movie, studyIntro, runningTrial, measurement};
 	
 	public GUIState guiState = GUIState.intro;
 	
 	public ConditionPath conditionPath;
-	
+	public int currentCondition = 0;
 	public string filename = "data.txt";
-	public float measure_seconds = 3.0f;
+	public float measure_arousal = 0.5f;
+	public float measure_valance = 0.5f;
+	//public float measure_
 	public MoviePlayBehavior natural_movie;
 	public MoviePlayBehavior unnatural_movie;
 	public GameObject guiCamera;
@@ -76,14 +78,16 @@ public class Director : MonoBehaviour {
 		switch(guiState) {
 		case GUIState.intro:
 		// Make a background box
-			GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "Thank you for your participation in this study. You should feel free to ask questions and can stop participating at any time.\n\n" +
-				"First, when you are ready, please click the 'Begin' button, relax, and watch a couple of movies about arms for about a minute.");
-			if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
+        	//measure_arousal = GUI.HorizontalSlider(new Rect((1024-800)/2, 200, 800-55, 50), measure_arousal, 0.0F, 1.0F);
+        	//measure_valance = GUI.HorizontalSlider(new Rect((1024-800)/2, 300, 800-55, 50), measure_valance, 0.0F, 1.0F);
+			
+			GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "Thank you for your participation in this study. You should feel free to ask questions and you may stop participating at any time.\n\n" +
+				"When you are ready, press the space bar, relax, and watch movies about arms for about a minute.");
+			//if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
+			if (Input.GetKeyDown (KeyCode.Space)) {
 				guiState = GUIState.movie;
 				StartCoroutine("PlayMovies");
 			}
-        	measure_seconds = GUI.HorizontalSlider(new Rect(25, 25, 100, 30), measure_seconds, 0.0F, 10.0F);
-
 			break;
 		case GUIState.movie:
 			break;
@@ -93,16 +97,45 @@ public class Director : MonoBehaviour {
 				"You will observe it attempting to complete its task.\n" +
 				"At the end of each trial you will be asked a few questions about how well the robot completed the task.\n" +
 				"You will also be asked what you think the robot might be 'feeling' as it was doing its work.\n\n" +
-				"When you are ready to start, click the 'Begin' button.");
+				"When you are ready to start, press the space bar.");
 			
-				if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
-					guiState = GUIState.runningTrial;
-					//StartCoroutine("RunTrial");
+				//if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
+						if (Input.GetKeyDown (KeyCode.Space)) {
+	
+			guiState = GUIState.runningTrial;
+					StartCoroutine("RunTrial");
 				}
 			break;
 		case GUIState.runningTrial:
 			guiCamera.SetActive(false); // = false;
 			break;
+		case GUIState.measurement:
+			
+			guiCamera.SetActive(true); // = false;
+			
+
+			StartCoroutine("ResetArm");
+			if (currentCondition < conditions.Length-1) {
+
+				GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
+				"Please evaluate the attempt using the paper form.\n\n" +
+				"When you are ready for the next attempt, press the space bar.");
+
+				//if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
+							if (Input.GetKeyDown (KeyCode.Space)) {
+
+				currentCondition = currentCondition + 1;
+					guiState = GUIState.runningTrial;
+					StartCoroutine("RunTrial");
+				}
+			} else {
+				GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
+				"Please evaluate the attempt using the paper form.\n\n" +
+				"When you are done, alert the experimenter to conclude this part of the study.");
+				
+			}
+			break;
+			
 		}
 		
 		// Make the first button. If it is pressed, Application.Loadlevel (1) will be executed
@@ -124,56 +157,53 @@ public class Director : MonoBehaviour {
 		natural_movie.gameObject.renderer.enabled = false;
 
 		conditions = new Condition[] {
-			new Condition(ConditionPath.bd, "linear", true),
-			new Condition(ConditionPath.bn, "linear", true),
-			new Condition(ConditionPath.bu, "linear", true),
-			new Condition(ConditionPath.fd, "linear", true),
-			new Condition(ConditionPath.fn, "linear", true),
-			new Condition(ConditionPath.fu, "linear", true),
-			new Condition(ConditionPath.nd, "linear", true),
+			//new Condition(ConditionPath.bd, "linear", true),
+			//new Condition(ConditionPath.bn, "linear", true),
+			//new Condition(ConditionPath.bu, "linear", true),
+			//new Condition(ConditionPath.fd, "linear", true),
+			//new Condition(ConditionPath.fn, "linear", true),
+			//new Condition(ConditionPath.fu, "linear", true),
+			//new Condition(ConditionPath.nd, "linear", true),
 			new Condition(ConditionPath.nn, "linear", true),
-			new Condition(ConditionPath.nu, "linear", true),	
+			//new Condition(ConditionPath.nu, "linear", true),	
 			
-			new Condition(ConditionPath.bd, "linear", false),
-			new Condition(ConditionPath.bn, "linear", false),
-			new Condition(ConditionPath.bu, "linear", false),
-			new Condition(ConditionPath.fd, "linear", false),
-			new Condition(ConditionPath.fn, "linear", false),
-			new Condition(ConditionPath.fu, "linear", false),
-			new Condition(ConditionPath.nd, "linear", false),
-			new Condition(ConditionPath.nn, "linear", false),
-			new Condition(ConditionPath.nu, "linear", false),		
+			//new Condition(ConditionPath.bd, "linear", false),
+			//new Condition(ConditionPath.bn, "linear", false),
+			//new Condition(ConditionPath.bu, "linear", false),
+			//new Condition(ConditionPath.fd, "linear", false),
+			//new Condition(ConditionPath.fn, "linear", false),
+			//new Condition(ConditionPath.fu, "linear", false),
+			//new Condition(ConditionPath.nd, "linear", false),
+			//new Condition(ConditionPath.nn, "linear", false),
+			//new Condition(ConditionPath.nu, "linear", false),		
 
 			
 			new Condition(ConditionPath.bd, "easeInOutQuart", true),
-			new Condition(ConditionPath.bn, "easeInOutQuart", true),
+			//new Condition(ConditionPath.bn, "easeInOutQuart", true),
 			new Condition(ConditionPath.bu, "easeInOutQuart", true),
 			new Condition(ConditionPath.fd, "easeInOutQuart", true),
-			new Condition(ConditionPath.fn, "easeInOutQuart", true),
+			//new Condition(ConditionPath.fn, "easeInOutQuart", true),
 			new Condition(ConditionPath.fu, "easeInOutQuart", true),
-			new Condition(ConditionPath.nd, "easeInOutQuart", true),
-			new Condition(ConditionPath.nn, "easeInOutQuart", true),
-			new Condition(ConditionPath.nu, "easeInOutQuart", true),	
+			//new Condition(ConditionPath.nd, "easeInOutQuart", true),
+			//new Condition(ConditionPath.nn, "easeInOutQuart", true),
+			//new Condition(ConditionPath.nu, "easeInOutQuart", true),	
 			
 			new Condition(ConditionPath.bd, "easeInOutQuart", false),
-			new Condition(ConditionPath.bn, "easeInOutQuart", false),
+			//new Condition(ConditionPath.bn, "easeInOutQuart", false),
 			new Condition(ConditionPath.bu, "easeInOutQuart", false),
 			new Condition(ConditionPath.fd, "easeInOutQuart", false),
-			new Condition(ConditionPath.fn, "easeInOutQuart", false),
+			//new Condition(ConditionPath.fn, "easeInOutQuart", false),
 			new Condition(ConditionPath.fu, "easeInOutQuart", false),
-			new Condition(ConditionPath.nd, "easeInOutQuart", false),
+			//new Condition(ConditionPath.nd, "easeInOutQuart", false),
 			new Condition(ConditionPath.nn, "easeInOutQuart", false),
-			new Condition(ConditionPath.nu, "easeInOutQuart", false),			
+			//new Condition(ConditionPath.nu, "easeInOutQuart", false),			
 		
 		};
 		Shuffle(conditions);
-		using (StreamWriter sw = File.AppendText(filename))
-            {
-				sw.WriteLine("Session Beginning" + Time.time);			
-        		foreach (Condition condition in conditions) {
-					sw.WriteLine (condition.conditionPath.ToString() + "," + condition.easeType + "," + condition.smoothPath.ToString());
-				}
-			}
+
+
+		ToggleNavigationVisuals();
+		StartCoroutine("ResetArm");
 		
 	}
 	
@@ -182,7 +212,7 @@ public class Director : MonoBehaviour {
 	
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			print ("space key was pressed");
-			StartCoroutine("DoAnimation");
+		//	StartCoroutine("DoAnimation");
 		}
 		
 		if (Input.GetKeyDown (KeyCode.Alpha0)) {
@@ -205,16 +235,12 @@ public class Director : MonoBehaviour {
 
 		
 		if (Input.GetKeyDown (KeyCode.T)) {
-			target.renderer.enabled = !target.renderer.enabled;
-			GameObject[] gos = GameObject.FindGameObjectsWithTag("waypoint");
-			foreach (GameObject go in gos) {
-				go.renderer.enabled = !go.renderer.enabled;	
-			}
+			ToggleNavigationVisuals();
 		}
 		
 		
 		if (Input.GetKeyDown (KeyCode.R)) {
-			target.transform.position = w011.transform.position;
+			StartCoroutine("ResetArm");
 		
 		}		
 				
@@ -301,14 +327,41 @@ public class Director : MonoBehaviour {
 	IEnumerator PlayMovies() {
 		natural_movie.gameObject.renderer.enabled = true;
 		natural_movie.movTexture.Play();
-		yield return new WaitForSeconds(5);
+		yield return new WaitForSeconds(30);
 		natural_movie.gameObject.renderer.enabled = false;
 		unnatural_movie.gameObject.renderer.enabled = true;
 		unnatural_movie.movTexture.Play();
 
-		yield return new WaitForSeconds(5);
+		yield return new WaitForSeconds(30);
 		unnatural_movie.gameObject.renderer.enabled = false;
 		guiState = GUIState.studyIntro;
+	}
+	
+	IEnumerator RunTrial() {
+		float runTime = 10.0f;
+		
+		yield return new WaitForSeconds(1);
+		Condition condition = conditions[currentCondition];
+		Debug.Log("Condition: " + condition.conditionPath.ToString() + "," + condition.easeType + "," + condition.smoothPath);
+		
+		AppendLog(Time.time.ToString() + "," + (currentCondition+1).ToString() + "," + condition.conditionPath.ToString() + "," + condition.easeType + "," + condition.smoothPath.ToString());
+
+		if (condition.smoothPath) {		
+			iTween.MoveTo(target, iTween.Hash("time", runTime, "path", iTweenPath.GetPath(condition.conditionPath.ToString()), "easetype", condition.easeType));
+			yield return new WaitForSeconds(runTime);
+
+		} else {
+		
+			Vector3[] waypoints = iTweenPath.GetPath(condition.conditionPath.ToString());
+			for(int i = 0 ; i < waypoints.Length; i++) {
+				iTween.MoveTo(target, iTween.Hash("time", runTime/waypoints.Length, "position", waypoints[i], "easetype", condition.easeType));
+				yield return new WaitForSeconds(runTime/waypoints.Length);
+			}
+		}
+		
+			
+		yield return new WaitForSeconds(2);
+		guiState = GUIState.measurement;
 	}
 	
 	    /// <summary>
@@ -334,6 +387,29 @@ public class Director : MonoBehaviour {
 	    	array[i - 1] = tmp;
 		}
     }
+	
+	void ToggleNavigationVisuals() {
+		
+		target.renderer.enabled = !target.renderer.enabled;
+		GameObject[] gos = GameObject.FindGameObjectsWithTag("waypoint");
+		foreach (GameObject go in gos) {
+			go.renderer.enabled = !go.renderer.enabled;	
+		}
+	}
+	
+	IEnumerator ResetArm() {
+		target.transform.position = new Vector3(0, 20, 0);
+		yield return new WaitForSeconds(1.0f);
+		target.transform.position = w011.transform.position;
+	}
+	
+	void AppendLog(string s) {
+		using (StreamWriter sw = File.AppendText(filename))
+            {
+				sw.WriteLine(s);			
+
+			}
+	}
 }
 
 
