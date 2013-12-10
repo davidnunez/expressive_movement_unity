@@ -46,12 +46,17 @@ public class Director : MonoBehaviour {
 	public enum GUIState {intro, movie, studyIntro, runningTrial, measurement};
 	
 	public GUIState guiState = GUIState.intro;
-	
+	public GameObject SARObject;
 	public ConditionPath conditionPath;
 	public int currentCondition = 0;
 	public string filename = "data.txt";
-	public float measure_arousal = 0.5f;
-	public float measure_valance = 0.5f;
+//	public float measure_arousal = 0.5f;
+//	public float measure_valance = 0.5f;
+	
+	private bool[] measure_arousal = new bool[] {false,false,false,false,false,false,false,false,false};
+	private bool[] measure_valance = new bool[] {false,false,false,false,false,false,false,false,false};
+	private bool[] measure_dominance = new bool[] {false,false,false,false,false,false,false,false,false};
+
 	//public float measure_
 	public MoviePlayBehavior natural_movie;
 	public MoviePlayBehavior unnatural_movie;
@@ -82,7 +87,7 @@ public class Director : MonoBehaviour {
         	//measure_valance = GUI.HorizontalSlider(new Rect((1024-800)/2, 300, 800-55, 50), measure_valance, 0.0F, 1.0F);
 			
 			GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "Thank you for your participation in this study. You should feel free to ask questions and you may stop participating at any time.\n\n" +
-				"When you are ready, press the space bar, relax, and watch movies about arms for about a minute.");
+				"When you are ready, press the space bar, relax, and watch 2 silent movies about arms for about a minute.");
 			//if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
 			if (Input.GetKeyDown (KeyCode.Space)) {
 				guiState = GUIState.movie;
@@ -92,10 +97,11 @@ public class Director : MonoBehaviour {
 		case GUIState.movie:
 			break;
 		case GUIState.studyIntro:
-			GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "Now, we'd like you to help us study a simulated robot arm.\n\n" +
-				"The robot's job is simply to touch a red ball.\n" +// It is a slow learner and doesn't have a very good memory.\n\
-				"You will observe it attempting to complete its task.\n" +
-				"At the end of each trial you will be asked a few questions about how well the robot completed the task.\n" +
+			GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "Now, we'd like you to help us study a robot arm.\n\n" +
+				"For this study, pretend that the robot can express emotions.\n\n" +
+				"The robot's job is simply to touch a red ball.\n\n" +// It is a slow learner and doesn't have a very good memory.\n\
+				"You will observe it attempting to complete this task multiple times.\n\n" +
+				"At the end of each trial you will be asked a few questions about how well the robot completed the task.\n\n" +
 				"You will also be asked what you think the robot might be 'feeling' as it was doing its work.\n\n" +
 				"When you are ready to start, press the space bar.");
 			
@@ -108,29 +114,92 @@ public class Director : MonoBehaviour {
 			break;
 		case GUIState.runningTrial:
 			guiCamera.SetActive(false); // = false;
+			measure_arousal = new bool[] {false,false,false,false,false,false,false,false,false};
+			measure_valance = new bool[] {false,false,false,false,false,false,false,false,false};
+			measure_dominance = new bool[] {false,false,false,false,false,false,false,false,false};
+
 			break;
 		case GUIState.measurement:
-			
+			SARObject.SetActive(true);
 			guiCamera.SetActive(true); // = false;
+			if(GUI.Toggle(new Rect(175+30, 260, 30, 30), measure_valance[0], "")) measure_valance[0] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(250+30, 260, 30, 30), measure_valance[1], "")) measure_valance[1] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(325+30, 260, 30, 30), measure_valance[2], "")) measure_valance[2] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(400+30, 260, 30, 30), measure_valance[3], "")) measure_valance[3] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(475+30, 260, 30, 30), measure_valance[4], "")) measure_valance[4] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(550+30, 260, 30, 30), measure_valance[5], "")) measure_valance[5] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(625+30, 260, 30, 30), measure_valance[6], "")) measure_valance[6] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(700+30, 260, 30, 30), measure_valance[7], "")) measure_valance[7] = SetMeOnly(measure_valance);
+			if(GUI.Toggle(new Rect(775+30, 260, 30, 30), measure_valance[8], "")) measure_valance[8] = SetMeOnly(measure_valance);
 			
+			if(GUI.Toggle(new Rect(175+30, 435, 30, 30), measure_arousal[0], "")) measure_arousal[0] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(250+30, 435, 30, 30), measure_arousal[1], "")) measure_arousal[1] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(325+30, 435, 30, 30), measure_arousal[2], "")) measure_arousal[2] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(400+30, 435, 30, 30), measure_arousal[3], "")) measure_arousal[3] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(475+30, 435, 30, 30), measure_arousal[4], "")) measure_arousal[4] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(550+30, 435, 30, 30), measure_arousal[5], "")) measure_arousal[5] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(625+30, 435, 30, 30), measure_arousal[6], "")) measure_arousal[6] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(700+30, 435, 30, 30), measure_arousal[7], "")) measure_arousal[7] = SetMeOnly(measure_arousal);
+			if(GUI.Toggle(new Rect(775+30, 435, 30, 30), measure_arousal[8], "")) measure_arousal[8] = SetMeOnly(measure_arousal);
 
-			StartCoroutine("ResetArm");
+			if(GUI.Toggle(new Rect(175+30, 610, 30, 30), measure_dominance[0], "")) measure_dominance[0] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(250+30, 610, 30, 30), measure_dominance[1], "")) measure_dominance[1] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(325+30, 610, 30, 30), measure_dominance[2], "")) measure_dominance[2] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(400+30, 610, 30, 30), measure_dominance[3], "")) measure_dominance[3] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(475+30, 610, 30, 30), measure_dominance[4], "")) measure_dominance[4] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(550+30, 610, 30, 30), measure_dominance[5], "")) measure_dominance[5] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(625+30, 610, 30, 30), measure_dominance[6], "")) measure_dominance[6] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(700+30, 610, 30, 30), measure_dominance[7], "")) measure_dominance[7] = SetMeOnly(measure_dominance);
+			if(GUI.Toggle(new Rect(775+30, 610, 30, 30), measure_dominance[8], "")) measure_dominance[8] = SetMeOnly(measure_dominance);
+			GUI.Box(new Rect(40,200, 100, 100), "Calm");
+			GUI.Box(new Rect(40,365, 100, 100), "Unhappy");
+			GUI.Box(new Rect(40,530, 100, 100), "Submissive");
+			GUI.Box(new Rect(880,200, 100, 100), "Excited");
+			GUI.Box(new Rect(880,365, 100, 100), "Happy");
+			GUI.Box(new Rect(880,530, 100, 100), "Dominant");
+
+
 			if (currentCondition < conditions.Length-1) {
 
-				GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
-				"Please evaluate the attempt using the paper form.\n\n" +
+				GUI.Box(new Rect(Screen.width/2-500,20,1000,120), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
+				"Pretend as if the robot was capable of expressing emotion.\n\n" +
+				"Using the scales below, indicate how the robot might have been feeling as it was completing its task.\n\n" +
 				"When you are ready for the next attempt, press the space bar.");
 
 				//if(GUI.Button(new Rect(Screen.width/2-40,Screen.height/2+200,80,20), "Begin")) {
-							if (Input.GetKeyDown (KeyCode.Space)) {
+				if (Input.GetKeyDown (KeyCode.Space)) {
+					Condition condition = conditions[currentCondition];
+					
+					
+					
+					AppendLog(Time.time.ToString() + "," + (currentCondition+1).ToString() + "," + condition.conditionPath.ToString() + "," + 
+						condition.easeType + "," + condition.smoothPath.ToString() + "," +
+						BoolArrayToInt(measure_arousal).ToString() + "," +
+						BoolArrayToInt(measure_dominance).ToString() + "," +
+						BoolArrayToInt(measure_valance).ToString()
 
-				currentCondition = currentCondition + 1;
+
+						);
+					
+/*					foreach (bool b in measure_arousal) {
+						AppendLog(b.ToString());	
+					}
+					foreach (bool b in measure_dominance) {
+						AppendLog(b.ToString());	
+					}
+					foreach (bool b in measure_valance) {
+						AppendLog(b.ToString());	
+					}*/
+
+					currentCondition = currentCondition + 1;
 					guiState = GUIState.runningTrial;
 					StartCoroutine("RunTrial");
+				
 				}
 			} else {
-				GUI.Box(new Rect(Screen.width/2-500,Screen.height/2,1000,500), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
-				"Please evaluate the attempt using the paper form.\n\n" +
+				GUI.Box(new Rect(Screen.width/2-500,20,1000,120), "That was attempt # " + (currentCondition + 1).ToString() + " out of " + conditions.Length.ToString() + " attempts.\n\n" + 
+				"Pretend as if the robot was capable of expressing emotion.\n\n" +
+				"Using the scales below, indicate how the robot might have been feeling as it was completing its task."	+
 				"When you are done, alert the experimenter to conclude this part of the study.");
 				
 			}
@@ -155,24 +224,24 @@ public class Director : MonoBehaviour {
 	void Start () {
 		unnatural_movie.gameObject.renderer.enabled = false;
 		natural_movie.gameObject.renderer.enabled = false;
-
+		guiState = GUIState.intro;
 		conditions = new Condition[] {
-			//new Condition(ConditionPath.bd, "linear", true),
+			new Condition(ConditionPath.bd, "linear", true),
 			//new Condition(ConditionPath.bn, "linear", true),
-			//new Condition(ConditionPath.bu, "linear", true),
-			//new Condition(ConditionPath.fd, "linear", true),
+			new Condition(ConditionPath.bu, "linear", true),
+			new Condition(ConditionPath.fd, "linear", true),
 			//new Condition(ConditionPath.fn, "linear", true),
-			//new Condition(ConditionPath.fu, "linear", true),
+			new Condition(ConditionPath.fu, "linear", true),
 			//new Condition(ConditionPath.nd, "linear", true),
 			new Condition(ConditionPath.nn, "linear", true),
 			//new Condition(ConditionPath.nu, "linear", true),	
 			
-			//new Condition(ConditionPath.bd, "linear", false),
+			new Condition(ConditionPath.bd, "linear", false),
 			//new Condition(ConditionPath.bn, "linear", false),
-			//new Condition(ConditionPath.bu, "linear", false),
-			//new Condition(ConditionPath.fd, "linear", false),
+			new Condition(ConditionPath.bu, "linear", false),
+			new Condition(ConditionPath.fd, "linear", false),
 			//new Condition(ConditionPath.fn, "linear", false),
-			//new Condition(ConditionPath.fu, "linear", false),
+			new Condition(ConditionPath.fu, "linear", false),
 			//new Condition(ConditionPath.nd, "linear", false),
 			//new Condition(ConditionPath.nn, "linear", false),
 			//new Condition(ConditionPath.nu, "linear", false),		
@@ -344,7 +413,6 @@ public class Director : MonoBehaviour {
 		Condition condition = conditions[currentCondition];
 		Debug.Log("Condition: " + condition.conditionPath.ToString() + "," + condition.easeType + "," + condition.smoothPath);
 		
-		AppendLog(Time.time.ToString() + "," + (currentCondition+1).ToString() + "," + condition.conditionPath.ToString() + "," + condition.easeType + "," + condition.smoothPath.ToString());
 
 		if (condition.smoothPath) {		
 			iTween.MoveTo(target, iTween.Hash("time", runTime, "path", iTweenPath.GetPath(condition.conditionPath.ToString()), "easetype", condition.easeType));
@@ -361,6 +429,7 @@ public class Director : MonoBehaviour {
 		
 			
 		yield return new WaitForSeconds(2);
+		StartCoroutine("ResetArm");
 		guiState = GUIState.measurement;
 	}
 	
@@ -410,6 +479,24 @@ public class Director : MonoBehaviour {
 
 			}
 	}
+	
+	bool SetMeOnly(bool[] measures) {
+		for (int i=0; i < measures.Length; i++)	{
+			measures[i] = false;
+		
+		}
+		return true;
+	}
+	
+	int BoolArrayToInt(bool[] measures) {
+		for (int i=0; i < measures.Length; i++)	{
+			if (measures[i] == true) {
+			  return i;
+			}
+		}
+		return -1;
+	}
+		
 }
 
 
